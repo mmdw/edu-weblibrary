@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+  
+  <!-- Servlets -->
+  <servlet>
+  	<servlet-name>AuthorRestServlet</servlet-name>
+	<servlet-class>edu.weblibrary.server.CommonRestServlet</servlet-class>    	
+  	<init-param>
+  		<param-name>DataObjectClass</param-name>
+  		<param-value>edu.weblibrary.server.persistence.cayenne.Author</param-value>  		
+  	</init-param>  		
+  </servlet>
+   
+  <servlet-mapping>
+	<servlet-name>AuthorRestServlet</servlet-name>
+  	<url-pattern>/rest_author</url-pattern>  	
+  </servlet-mapping>  
+   
+  <servlet>
+  	<servlet-name>BookRestServlet</servlet-name>
+	<servlet-class>edu.weblibrary.server.BookRestServlet</servlet-class>    	
+  	<init-param>
+  		<param-name>DataObjectClass</param-name>
+  		<param-value>edu.weblibrary.server.persistence.cayenne.Book</param-value>  		
+  	</init-param>  		
+  </servlet>
+  
+   <servlet-mapping>
+	<servlet-name>BookRestServlet</servlet-name>
+  	<url-pattern>/rest_book</url-pattern>  	
+  </servlet-mapping>   
+  
+   <servlet>
+  	<servlet-name>bookReportGenerator</servlet-name>
+	<servlet-class>edu.weblibrary.server.BookReportGenerator</servlet-class>    	 		
+  </servlet>  
+
+  <servlet-mapping>
+  	<servlet-name>bookReportGenerator</servlet-name>
+  	<url-pattern>/reportGenerator</url-pattern>
+  </servlet-mapping>
+    
+  <!-- Default page to serve -->
+  <welcome-file-list>
+    <welcome-file>weblibrary.html</welcome-file>
+  </welcome-file-list>
+
+</web-app>

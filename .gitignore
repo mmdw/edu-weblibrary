@@ -1,0 +1,5 @@
+*.class
+
+war/WEB-INF/deploy/*
+war/WEB-INF/lib/*
+war/weblibrary/*
