@@ -11,19 +11,15 @@ public class FormAuthor extends DynamicForm {
 	public FormAuthor() {
 		setDataSource(AuthorDS.getInstance());
 		
-		IntegerItem id = new IntegerItem("id");
+		IntegerItem id = new IntegerItem("id", "id");
 		TextItem surnaname = new TextItem("surname", "Фамилия");
 		TextItem name = new TextItem("name", "Имя");		
 		TextItem patronymic = new TextItem("patronymic", "Отчество");
 		IntegerItem birthYear = new IntegerItem("birthYear", "Год рождения");
 		
 		setFields(id, name, surnaname, patronymic, birthYear);	
-		setBrowserSpellCheck(false);
-		
+		setBrowserSpellCheck(false);		
+
 		id.setVisible(false);
-		
-		final ValuesManager vm = new ValuesManager();
-		vm.setDataSource(AuthorDS.getInstance());
-		setValuesManager(vm);
 	}
 }

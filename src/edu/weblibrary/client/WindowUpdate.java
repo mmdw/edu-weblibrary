@@ -50,7 +50,7 @@ public class WindowUpdate extends Window {
 			addItem(mainLayout);
 			addItem(buttonsLayout);
 			
-			form.getValuesManager().addHiddenValidationErrorsHandler(new HiddenValidationErrorsHandler() {
+			form.addHiddenValidationErrorsHandler(new HiddenValidationErrorsHandler() {
 				public void onHiddenValidationErrors(HiddenValidationErrorsEvent event) {
 					String errors = new String();
 					
@@ -68,7 +68,7 @@ public class WindowUpdate extends Window {
 						DSRequest req = new DSRequest();
 						req.setWillHandleError(true);					
 
-						form.getValuesManager().saveData(new DSCallback() {
+						form.saveData(new DSCallback() {
 							public void execute(DSResponse response,
 									Object rawData, DSRequest request) {
 								GWT.log("Status: " + String.valueOf(response.getStatus()));

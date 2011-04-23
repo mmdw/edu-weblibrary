@@ -1,13 +1,16 @@
 package edu.weblibrary.client;
 
 import com.google.gwt.core.client.GWT;
+import com.smartgwt.client.core.KeyIdentifier;
 import com.smartgwt.client.data.DSCallback;
 import com.smartgwt.client.data.DSRequest;
 import com.smartgwt.client.data.DSResponse;
+import com.smartgwt.client.rpc.RPCResponse;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
+import com.smartgwt.client.util.KeyCallback;
+import com.smartgwt.client.util.Page;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -25,7 +28,18 @@ public class WindowAdd extends Window {
 	HLayout buttonsLayout = new HLayout(5);
 	VLayout mainLayout = new VLayout();
 	
-	public WindowAdd(final DynamicForm form) {	
+	public WindowAdd(final DynamicForm form) {		
+		if (!GWT.isScript()) {
+		    KeyIdentifier debugKey = new KeyIdentifier();
+		    debugKey.setCtrlKey(true);
+		    debugKey.setKeyName("[");
+
+		    Page.registerKey(debugKey, new KeyCallback() {
+		        public void execute(String keyName) {
+		            SC.showConsole();
+		        }
+		    });
+		}		
 		this.form = form;
 		
 		okButton.setIcon("[SKIN]/actions/ok.png");
@@ -50,7 +64,7 @@ public class WindowAdd extends Window {
 		addItem(mainLayout);
 		addItem(buttonsLayout);
 		
-		form.getValuesManager().addHiddenValidationErrorsHandler(new HiddenValidationErrorsHandler() {
+		form.addHiddenValidationErrorsHandler(new HiddenValidationErrorsHandler() {
 			public void onHiddenValidationErrors(HiddenValidationErrorsEvent event) {
 				
 				String errors = new String();					
@@ -66,16 +80,15 @@ public class WindowAdd extends Window {
 			public void onClick(ClickEvent event) {
 				if (form.validate()) {					
 					DSRequest req = new DSRequest();
-					req.setWillHandleError(true);					
-
-					form.getValuesManager().saveData(new DSCallback() {
+					req.setWillHandleError(true);
+					
+					form.saveData(new DSCallback() {
 						public void execute(DSResponse response,
 								Object rawData, DSRequest request) {
 							GWT.log("Status: " + String.valueOf(response.getStatus()));
 							
-							if(response.getStatus() == response.STATUS_SUCCESS) {
+							if(response.getStatus() == RPCResponse.STATUS_SUCCESS) {
 								hide();
-								form.clearValues();
 							} else {
 								SC.say("Ошибка", "Не удалось добавить запись");
 							}

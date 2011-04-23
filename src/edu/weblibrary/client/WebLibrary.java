@@ -67,10 +67,10 @@ public class WebLibrary implements EntryPoint {
 		authorGrid.setDataPageSize(80);
 		
 		ListGridField authorIdField = new ListGridField("id");
-		authorIdField.setHidden(true);
+		authorIdField.setHidden(false);
 		
 		authorGrid.setFields(
-				authorIdField,				
+				authorIdField,	
 				new ListGridField("name", "Имя"), 
 				new ListGridField("surname", "Фамилия"),
 				new ListGridField("patronymic", "Отчество"),
@@ -78,8 +78,8 @@ public class WebLibrary implements EntryPoint {
 			);		
 		
 		authorGrid.setAutoFetchData(true);
-		authorGrid.setCanEdit(true);
-		authorGrid.setEditByCell(true);
+		authorGrid.setCanEdit(false);
+		authorGrid.setEditByCell(false);
 		authorGrid.setHeight100();
 		
 		IButton authorAddButton = new IButton("Добавить");
@@ -87,7 +87,6 @@ public class WebLibrary implements EntryPoint {
 		authorAddButton.addClickHandler(new ClickHandler() {			
 			public void onClick(ClickEvent event) {
 				windowAdd.addNewRecord();
-				bookGrid.invalidateCache();				
 			}
 		});
 		
@@ -119,7 +118,6 @@ public class WebLibrary implements EntryPoint {
 				if (authorGrid.getSelectedRecord() != null)	{
 					authorUpdateWindow.editSelectedData(authorGrid);
 					authorUpdateWindow.show();
-					bookGrid.fetchData();
 				}
 			}
 		});
@@ -166,7 +164,6 @@ public class WebLibrary implements EntryPoint {
 		IButton bookAddButton = new IButton("Добавить книгу", new ClickHandler() {			
 			public void onClick(ClickEvent event) {
 				bookAddWindow.addNewRecord();
-				bookGrid.fetchData();
 			}
 		});
 		bookAddButton.setIcon("[SKIN]/actions/plus.png");
@@ -177,7 +174,6 @@ public class WebLibrary implements EntryPoint {
 				if (bookGrid.getSelectedRecord() != null)	{
 					bookUpdateWindow.editSelectedData(bookGrid);
 					bookUpdateWindow.show();
-					bookGrid.fetchData();
 				}				
 			}
 		});

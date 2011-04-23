@@ -19,6 +19,7 @@ public class XMLAddResponse {
 	
 	Element rootElement;
 	Element statusElement;
+	Element dataElement;
 	Text    statusValue;
 	Element errorsElement;
 	Element recordElement;
@@ -32,6 +33,7 @@ public class XMLAddResponse {
 			rootElement = doc.createElement("response");
 			statusElement = doc.createElement("status");
 			statusValue = doc.createTextNode("");
+			dataElement = null;
 			recordElement = null;
 			errorsElement = null;
 			
@@ -50,9 +52,11 @@ public class XMLAddResponse {
 	}
 	
 	public void addRecordAttribute(String name, String value) {
-		if (recordElement == null) {
+		if (dataElement == null) {
+			dataElement = doc.createElement("data");
 			recordElement = doc.createElement("record");
-			rootElement.appendChild(recordElement);
+			dataElement.appendChild(recordElement);
+			rootElement.appendChild(dataElement);
 		}
 		Element attributeElement = doc.createElement(name);			
 		attributeElement.appendChild(doc.createTextNode(value));		

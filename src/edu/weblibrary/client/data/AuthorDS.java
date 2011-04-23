@@ -65,26 +65,4 @@ public class AuthorDS extends RestDataSource {
 		
 		setDataURL("rest_author");
 	}	
-	
-	
-	protected void transformResponse(DSResponse response, DSRequest request, Object xmlData)
-	{
-		/*
-		GWT.log("! transformResponse");
-		
-		String status = XMLTools.selectString(xmlData, "/response/status");
-		GWT.log("status = " + status);
-		
-		if (status.equals("-4")) {
-			
-			GWT.log(XMLTools.selectString(xmlData, "*"));
-			
-	          response.setStatus(RPCResponse.STATUS_VALIDATION_ERROR);
-	          Object errors = XMLTools.selectNodes(xmlData, "/response/errors");
-	          JavaScriptObject errorsJS = XMLTools.toJS(errors);
-	          response.setErrors(errorsJS);
-		}
-		*/
-		super.transformResponse(response, request, xmlData);
-	}
 }
