@@ -80,15 +80,15 @@ public class FormBook extends DynamicForm {
 		bookArrivalDate.setWrapTitle(false);
 		
 		TextAreaItem bookKeywords = new TextAreaItem("keywords", "Ключевые слова");
-		SpinnerItem bookNumber = new SpinnerItem("number","Количество книг");
-		bookNumber.setMin(0);
+		SpinnerItem bookQuantity = new SpinnerItem("quantity","Количество книг");
+		bookQuantity.setMin(0);
 		
 		FloatItem bookPrice = new FloatItem("price", "Цена");
 		IntegerItem bookPublicationYear = new IntegerItem("publicationYear", "Год издания");
 		TextItem bookPublishing = new TextItem("publishing", "Издательство");
 		TextItem bookTitle = new TextItem("title", "Название");
 		
-		setFields(bookId, bookTitle, authorId, authorSelectItem, bookArrivalDate, bookNumber, bookPrice,
+		setFields(bookId, bookTitle, authorId, authorSelectItem, bookArrivalDate, bookQuantity, bookPrice,
 				bookPublicationYear, bookPublishing, bookKeywords);
 		
 		bookId.setVisible(false);

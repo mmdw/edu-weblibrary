@@ -18,10 +18,10 @@ public abstract class _Book extends CayenneDataObject {
     public static final String AUTHOR_ID_PROPERTY = "authorId";
     public static final String ID_PROPERTY = "id";
     public static final String KEYWORDS_PROPERTY = "keywords";
-    public static final String NUMBER_PROPERTY = "number";
     public static final String PRICE_PROPERTY = "price";
     public static final String PUBLICATION_YEAR_PROPERTY = "publicationYear";
     public static final String PUBLISHING_PROPERTY = "publishing";
+    public static final String QUANTITY_PROPERTY = "quantity";
     public static final String TITLE_PROPERTY = "title";
     public static final String TO_AUTHOR_PROPERTY = "toAuthor";
 
@@ -55,13 +55,6 @@ public abstract class _Book extends CayenneDataObject {
         return (String)readProperty("keywords");
     }
 
-    public void setNumber(Integer number) {
-        writeProperty("number", number);
-    }
-    public Integer getNumber() {
-        return (Integer)readProperty("number");
-    }
-
     public void setPrice(Double price) {
         writeProperty("price", price);
     }
@@ -81,6 +74,13 @@ public abstract class _Book extends CayenneDataObject {
     }
     public String getPublishing() {
         return (String)readProperty("publishing");
+    }
+
+    public void setQuantity(Integer quantity) {
+        writeProperty("quantity", quantity);
+    }
+    public Integer getQuantity() {
+        return (Integer)readProperty("quantity");
     }
 
     public void setTitle(String title) {

@@ -212,7 +212,7 @@ public class WebLibrary implements EntryPoint {
 				new ListGridField("title", "Название"),
 				new ListGridField("authorInitial","Автор"),
 				new ListGridField("publishing", "Издательство"),
-				new ListGridField("number", "Количество"),
+				new ListGridField("quantity", "Количество"),
 				new ListGridField("arrivalDate", "Дата поступления"),
 				new ListGridField("price", "цена"),
 				new ListGridField("publicationYear", "Год издания"),

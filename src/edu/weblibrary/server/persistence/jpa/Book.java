@@ -34,8 +34,8 @@ public class Book {
 	@Column(name="price")
 	private float price;
 	
-	@Column(name="number")
-	private int number;
+	@Column(name="quantity")
+	private int quantity;
 	
 	@Temporal(value=TemporalType.DATE)
 	@Column(name="arrival_date")
@@ -57,7 +57,7 @@ public class Book {
 		this.publishing = publishing;
 		this.publicationYear = publicationYear;
 		this.price = price;
-		this.number = number;
+		this.quantity = number;
 		this.arrivalDate = arrivalDate;
 		this.keywords = keywords;		
 	}
@@ -86,11 +86,11 @@ public class Book {
 	public float getPrice() {
 		return price;
 	}
-	public void setNumber(int number) {
-		this.number = number;
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
 	}
-	public int getNumber() {
-		return number;
+	public int getQuantity() {
+		return quantity;
 	}
 	public void setArrivalDate(Date arrivalDate) {
 		this.arrivalDate = arrivalDate;

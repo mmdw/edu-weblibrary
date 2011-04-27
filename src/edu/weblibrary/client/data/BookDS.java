@@ -47,7 +47,7 @@ public class BookDS extends RestDataSource {
 		DataSourceIntegerField authorId = new DataSourceIntegerField("authorId");
 	    DataSourceDateField bookArrivalDate = new DataSourceDateField("arrivalDate");
 	    DataSourceTextField bookKeywords = new DataSourceTextField("keywords");
-	    DataSourceIntegerField bookNumber = new DataSourceIntegerField("number");
+	    DataSourceIntegerField bookQuantity = new DataSourceIntegerField("quantity");
 	    DataSourceFloatField bookPrice = new DataSourceFloatField("price");
 	    DataSourceIntegerField bookPublicationYear = new DataSourceIntegerField("publicationYear");	    
 	    DataSourceTextField bookPublishing = new DataSourceTextField("publishing");
@@ -58,7 +58,7 @@ public class BookDS extends RestDataSource {
 	    bookPublishing.setRequired(true);
 	    bookPublicationYear.setRequired(true);
 	    bookPrice.setRequired(true);
-	    bookNumber.setRequired(true);
+	    bookQuantity.setRequired(true);
 	    bookArrivalDate.setRequired(true);	    
 	    
 //	    public static final String TO_AUTHOR_PROPERTY = "toAuthor";
@@ -72,7 +72,7 @@ public class BookDS extends RestDataSource {
 		
 */		
 		setFields(authorId, authorInitial, bookId, bookArrivalDate, bookKeywords, 
-				bookNumber, bookPrice, bookPublicationYear, bookPublishing, bookTitle);
+				bookQuantity, bookPrice, bookPublicationYear, bookPublishing, bookTitle);
 		setDataURL("rest_book");		
 	}
 
