@@ -1,10 +1,8 @@
 package edu.weblibrary.server;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.StringWriter;
-
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
@@ -24,7 +22,9 @@ import org.apache.cayenne.DeleteDenyException;
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.access.DataContext;
 import org.apache.cayenne.exp.ExpressionFactory;
+import org.apache.cayenne.map.DeleteRule;
 import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.map.SQLResult;
 import org.apache.cayenne.query.SQLTemplate;
 import org.apache.cayenne.query.SelectQuery;
@@ -32,8 +32,11 @@ import org.apache.cayenne.query.SortOrder;
 import org.apache.cayenne.validation.BeanValidationFailure;
 import org.apache.cayenne.validation.ValidationException;
 import org.apache.cayenne.validation.ValidationFailure;
+import org.apache.log4j.Logger;
 
 import com.smartgwt.client.rpc.RPCResponse;
+
+import edu.weblibrary.shared.ResponseStatusEx;
 
 /**
  * <p>Сервлет, реализующий удаленную работу с одной таблицей базы данных при помощи Apache Cayenne.
@@ -59,6 +62,8 @@ import com.smartgwt.client.rpc.RPCResponse;
  */
 @SuppressWarnings("serial")
 public class CommonRestServlet extends HttpServlet {
+	public static final Logger LOG = Logger.getLogger(CommonRestServlet.class);
+	
 	private enum Operation {
 		FETCH, ADD, REMOVE, UPDATE
 	}
@@ -135,14 +140,19 @@ public class CommonRestServlet extends HttpServlet {
 		resp.setContentType("text/xml");
 		PrintWriter out = resp.getWriter();
 		
+		StringWriter sw = new StringWriter();
+		sw.write("\n");
+		
 		for (Enumeration<String> e = req.getParameterNames(); e.hasMoreElements();) {
-			String param = e.nextElement();
+			String param = e.nextElement();	
 			
-			System.out.print(param + " =");
+			sw.write(param + " =");			
 			for(String s: req.getParameterValues(param))
-				System.out.print(" ".concat(s));
-			System.out.println();
-		}			
+				sw.write(" ".concat(s));
+			sw.write("\n");
+		}
+		
+		LOG.debug(sw.toString());
 				
 		Operation op = Operation.valueOf(req.getParameter("_operationType").toUpperCase());		
 	
@@ -170,25 +180,36 @@ public class CommonRestServlet extends HttpServlet {
 	 * @param map атрибуты хранимого объекта, извлеченные из параметров запроса
 	 * @see com.smartgwt.client.data.RestDataSource 
 	 */
-	protected void remove(PrintWriter out, Map<String, String> map) {		
+	protected void remove(PrintWriter out, Map<String, String> map) {	
+		LOG.debug("*** REMOVE started");
 		SelectQuery query = 
 			new SelectQuery(DataObjectClass, ExpressionFactory.matchExp(ID_PK_COLUMN, map.get(ID_PK_COLUMN)));		
 		
-		CayenneDataObject a = (CayenneDataObject) context.performQuery(query).get(0);
+		CayenneDataObject a = (CayenneDataObject) context.performQuery(query).get(0);		
+		XMLResponse resp = new XMLResponse();
+		
+		for (ObjRelationship rel: a.getObjEntity().getRelationships()) {
+			if (rel.getDeleteRule() == DeleteRule.DENY) {
+				resp.setStatus(ResponseStatusEx.STATUS_DELETE_DENY_ERROR);
+				resp.writeToStream(out);				
+				return;
+			}
+		}			
 		
 		try {
 			context.deleteObject(a);
 			context.commitChanges();
-		} catch (DeleteDenyException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println(e.getMessage());
 			
-			out.print("<response><status>-4</status></response>");
+			resp.setStatus(-4);			
 			context.rollbackChanges();
 			return;
 		}		
 		
-		out.print("<response><status>0</status></response>");
+		resp.writeToStream(out);
+		LOG.debug("*** REMOVE finished");
 	}
 
 	/**
@@ -197,7 +218,8 @@ public class CommonRestServlet extends HttpServlet {
 	 * @param map атрибуты хранимого объекта, извлеченные из параметров запроса
 	 * @see com.smartgwt.client.data.RestDataSource 
 	 */
-	protected void update(PrintWriter out, Map<String, String> attributes) {		
+	protected void update(PrintWriter out, Map<String, String> attributes) {	
+		LOG.debug("*** UPDATE started");
 		SelectQuery updateQuery = new SelectQuery(DataObjectClass, 
 				ExpressionFactory.matchExp(ID_PK_COLUMN, attributes.get(ID_PK_COLUMN)));
 		
@@ -221,11 +243,11 @@ public class CommonRestServlet extends HttpServlet {
 		
 		xmlResponse.setStatus(0);
 		xmlResponse.writeToStream(out);
+		LOG.debug("*** UPDATE finished");
 	}
 
-	//?  <record field1="value" field2="value" />
 	protected void fetch(PrintWriter out, int startRow, int endRow, String sortBy) {		
-		System.out.println("*** FETCH started");
+		LOG.debug("*** FETCH started");
 		SelectQuery query = new SelectQuery(DataObjectClass);
 		query.setFetchLimit(endRow - startRow + 1);
 		query.setFetchOffset(startRow);
@@ -251,7 +273,7 @@ public class CommonRestServlet extends HttpServlet {
 		
 		xmlResponse.writeToStream(out);
 
-		System.out.println("*** FETCH finished");
+		LOG.debug("*** FETCH finished");
 	}
 	/**
 	 * Добавляет новую запись в БД.
@@ -261,6 +283,7 @@ public class CommonRestServlet extends HttpServlet {
 	 */
 	protected void add(PrintWriter out, Map<String, String> attributes) throws ServletException
 	{			
+		LOG.debug("*** ADD started");
 		XMLResponse xmlResponse = new XMLResponse();		
 		xmlResponse.setStatus(0);
 		
@@ -297,9 +320,10 @@ public class CommonRestServlet extends HttpServlet {
 		}	
 		xmlResponse.addRecord(record);		
 		xmlResponse.writeToStream(out);
+		LOG.debug("*** ADD finished");
 	}
 	
-	public void init(ServletConfig config) throws ServletException	{		
+	public void init(ServletConfig config) throws ServletException	{	
 		try {
 			DataObjectClass =
 				(Class<? super CayenneDataObject>) Class.forName((String) config.getInitParameter("DataObjectClass"));

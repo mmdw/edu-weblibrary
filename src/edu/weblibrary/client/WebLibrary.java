@@ -19,7 +19,6 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
-import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
@@ -27,11 +26,11 @@ import com.smartgwt.client.widgets.tab.TabSet;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.ui.CheckBox;
 
-import edu.weblibrary.client.data.AuthorDS;
-import edu.weblibrary.client.data.BookDS;
+import edu.weblibrary.shared.ResponseStatusEx;
  
 public class WebLibrary implements EntryPoint { 
-	public void onModuleLoad()	{		
+	public void onModuleLoad()	{
+//		SC.showConsole();
 		DateUtil.setShortDateDisplayFormatter(new DateDisplayFormatter() {			
             public String format(Date date) {
                 if(date == null) return null;
@@ -58,29 +57,10 @@ public class WebLibrary implements EntryPoint {
 		authorUpdateWindow.setWidth(300);
 		authorUpdateWindow.setHeight(200);
 		
-		final ListGrid authorGrid = new ListGrid();
-		final ListGrid bookGrid = new ListGrid();
+		final ListGrid authorGrid = new AuthorGrid();
+		final ListGrid bookGrid = new BookGrid();
 		
 		authorGrid.setWidth(500);
-		authorGrid.setHeight(400);
-		authorGrid.setDataSource(AuthorDS.getInstance());
-		authorGrid.setEmptyCellValue("--");
-		authorGrid.setDataPageSize(80);
-		
-		ListGridField authorIdField = new ListGridField("id");
-		authorIdField.setHidden(false);
-		
-		authorGrid.setFields(
-				authorIdField,	
-				new ListGridField("name", "Имя"), 
-				new ListGridField("surname", "Фамилия"),
-				new ListGridField("patronymic", "Отчество"),
-				new ListGridField("birthYear", "Год рождения")
-			);		
-		
-		authorGrid.setAutoFetchData(true);
-		authorGrid.setCanEdit(false);
-		authorGrid.setEditByCell(false);
 		authorGrid.setHeight100();
 		
 		IButton authorAddButton = new IButton("Добавить");
@@ -98,9 +78,12 @@ public class WebLibrary implements EntryPoint {
 				DSCallback callback = new DSCallback() {
 					public void execute(DSResponse response, Object rawData, DSRequest request) {
 						GWT.log("Remove status: " + String.valueOf(response.getStatus()));
-						
-						if(response.getStatus() != RPCResponse.STATUS_SUCCESS) 
-							SC.say("Ошибка", "Не удалось удалить запись");					
+						if (response.getStatus() == ResponseStatusEx.STATUS_DELETE_DENY_ERROR) {
+							SC.say("Ошибка", "Невозможно удалить автора, пока в библиотеке есть "+
+									"хотя бы одна его книга.");																
+						} else	if(response.getStatus() != RPCResponse.STATUS_SUCCESS) {
+							SC.say("Ошибка", "Не удалось удалить запись");
+						}											
 					}
 				};
 				
@@ -158,9 +141,7 @@ public class WebLibrary implements EntryPoint {
 		
 		bookGrid.setWidth100();
 		bookGrid.setHeight100();
-		bookGrid.setDataSource(BookDS.getInstance());
-		bookGrid.setEmptyCellValue("--");
-		bookGrid.setDataPageSize(80);
+
 		
 		IButton bookAddButton = new IButton("Добавить книгу", new ClickHandler() {			
 			public void onClick(ClickEvent event) {
@@ -183,7 +164,6 @@ public class WebLibrary implements EntryPoint {
 		
 		IButton bookReportButton = new IButton("Отчет", new ClickHandler() {			
 			public void onClick(ClickEvent event) {
-				// TODO Auto-generated method stub
 				if (bookGrid.getSelectedRecord() != null) {
 					bookReportWindow.setBookId(bookGrid.getSelectedRecord().getAttributeAsInt("id"));
 					bookReportWindow.show();	
@@ -196,9 +176,11 @@ public class WebLibrary implements EntryPoint {
 					DSCallback callback = new DSCallback() {
 						public void execute(DSResponse response, Object rawData, DSRequest request) {
 							GWT.log("Remove status: " + String.valueOf(response.getStatus()));
-							
-							if(response.getStatus() != RPCResponse.STATUS_SUCCESS) 
-								SC.say("Ошибка", "Не удалось удалить запись");					
+							if (response.getStatus() == ResponseStatusEx.STATUS_DELETE_DENY_ERROR) {
+								SC.say("Ошибка", "DELETE_DENY_ERROR");																
+							} else	if(response.getStatus() != RPCResponse.STATUS_SUCCESS) {
+								SC.say("Ошибка", "Не удалось удалить запись");
+							}
 						}
 					};
 					
@@ -208,20 +190,6 @@ public class WebLibrary implements EntryPoint {
 				}
 		});
 		bookRemoveButton.setIcon("[SKIN]/actions/remove.png");
-		
-		bookGrid.setFields(
-				new ListGridField("title", "Название"),
-				new ListGridField("authorInitial","Автор"),
-				new ListGridField("publishing", "Издательство"),
-				new ListGridField("quantity", "Количество"),
-				new ListGridField("arrivalDate", "Дата поступления"),
-				new ListGridField("price", "цена"),
-				new ListGridField("publicationYear", "Год издания"),
-				new ListGridField("keywords", "Ключевые слова"));
-		
-		bookGrid.setAutoFetchData(true);
-		bookGrid.setCanEdit(true);
-		bookGrid.setEditByCell(true);
 		
 		VLayout bookLayout = new VLayout();
 		HLayout bookTopLayout = new HLayout();
@@ -238,7 +206,7 @@ public class WebLibrary implements EntryPoint {
 		
 		final TabSet tabSet = new TabSet();
 		tabSet.setTabBarPosition(Side.TOP);
-		tabSet.setWidth(800);
+		tabSet.setWidth100();
 		tabSet.setHeight100();		
 		Tab authorTab = new Tab("Авторы");
 		Tab bookTab = new Tab("Книги");	

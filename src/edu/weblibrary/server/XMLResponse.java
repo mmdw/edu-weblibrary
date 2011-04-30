@@ -47,7 +47,7 @@ public class XMLResponse {
 		rootElement = doc.createElement("response");		
 		
 		doc.appendChild(rootElement);
-	}	
+	}
 	
 	void setFetchInfo(int startRow, int endRow, int totalRows, String sortBy) {
 		if (startRowElement == null) {
