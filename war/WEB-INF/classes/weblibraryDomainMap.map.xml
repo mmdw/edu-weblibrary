@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-map xmlns="http://cayenne.apache.org/schema/3.0/modelMap"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://cayenne.apache.org/schema/3.0/modelMap http://cayenne.apache.org/schema/3.0/modelMap.xsd"
+  project-version="3.0.0.1">
+	<property name="defaultPackage" value="edu.weblibrary.server.persistence.cayenne"/>
+	<db-entity name="author">
+		<db-attribute name="birth_year" type="INTEGER" isMandatory="true" length="10"/>
+		<db-attribute name="id" type="INTEGER" isPrimaryKey="true" isMandatory="true" length="10"/>
+		<db-attribute name="name" type="VARCHAR" isMandatory="true" length="15"/>
+		<db-attribute name="patronymic" type="VARCHAR" length="20"/>
+		<db-attribute name="surname" type="VARCHAR" isMandatory="true" length="40"/>
+	</db-entity>
+	<db-entity name="book">
+		<db-attribute name="arrival_date" type="DATE" isMandatory="true" length="13"/>
+		<db-attribute name="author_id" type="INTEGER" length="10"/>
+		<db-attribute name="id" type="INTEGER" isPrimaryKey="true" isMandatory="true" length="10"/>
+		<db-attribute name="keywords" type="VARCHAR" length="2147483647"/>
+		<db-attribute name="quantity" type="INTEGER" isMandatory="true" length="10"/>
+		<db-attribute name="price" type="DOUBLE" isMandatory="true" length="17" scale="17"/>
+		<db-attribute name="publication_year" type="INTEGER" isMandatory="true" length="10"/>
+		<db-attribute name="publishing" type="VARCHAR" isMandatory="true" length="80"/>
+		<db-attribute name="title" type="VARCHAR" isMandatory="true" length="255"/>
+	</db-entity>
+	<obj-entity name="Author" className="edu.weblibrary.server.persistence.cayenne.Author" dbEntityName="author">
+		<obj-attribute name="birthYear" type="java.lang.Integer" db-attribute-path="birth_year"/>
+		<obj-attribute name="id" type="java.lang.Integer" db-attribute-path="id"/>
+		<obj-attribute name="name" type="java.lang.String" db-attribute-path="name"/>
+		<obj-attribute name="patronymic" type="java.lang.String" db-attribute-path="patronymic"/>
+		<obj-attribute name="surname" type="java.lang.String" db-attribute-path="surname"/>
+	</obj-entity>
+	<obj-entity name="Book" className="edu.weblibrary.server.persistence.cayenne.Book" dbEntityName="book">
+		<obj-attribute name="arrivalDate" type="java.util.Date" db-attribute-path="arrival_date"/>
+		<obj-attribute name="authorId" type="java.lang.Integer" db-attribute-path="author_id"/>
+		<obj-attribute name="id" type="java.lang.Integer" db-attribute-path="id"/>
+		<obj-attribute name="keywords" type="java.lang.String" db-attribute-path="keywords"/>
+		<obj-attribute name="price" type="java.lang.Double" db-attribute-path="price"/>
+		<obj-attribute name="publicationYear" type="java.lang.Integer" db-attribute-path="publication_year"/>
+		<obj-attribute name="publishing" type="java.lang.String" db-attribute-path="publishing"/>
+		<obj-attribute name="quantity" type="java.lang.Integer" db-attribute-path="quantity"/>
+		<obj-attribute name="title" type="java.lang.String" db-attribute-path="title"/>
+	</obj-entity>
+	<db-relationship name="bookArray" source="author" target="book" toMany="true">
+		<db-attribute-pair source="id" target="author_id"/>
+	</db-relationship>
+	<db-relationship name="toAuthor" source="book" target="author" toMany="false">
+		<db-attribute-pair source="author_id" target="id"/>
+	</db-relationship>
+	<obj-relationship name="bookArray" source="Author" target="Book" deleteRule="Deny" db-relationship-path="bookArray"/>
+	<obj-relationship name="toAuthor" source="Book" target="Author" deleteRule="Nullify" db-relationship-path="toAuthor"/>
+</data-map>
