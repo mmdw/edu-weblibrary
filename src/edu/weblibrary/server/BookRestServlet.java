@@ -9,9 +9,17 @@ import org.apache.cayenne.CayenneDataObject;
 import org.apache.cayenne.query.SelectQuery;
 import org.apache.cayenne.query.SortOrder;
 
+/**
+ * Сервлет, реализующий работу с таблицей book. 
+ * В XML ответе на запрос FETCH кроме информации о книге
+ * также отправляется имя и фамилия автора.
+ * 
+ * @author mmdw
+ */
 public class BookRestServlet extends CommonRestServlet {
+	static final String AUTHOR_INITIAL_ATTRIBUTE_NAME = "authorInitial";
+	
 	protected void fetch(PrintWriter out, int startRow, int endRow, String sortBy) {		
-		System.out.println("*** FETCH started");
 		SelectQuery query = new SelectQuery(DataObjectClass);
 		query.setFetchLimit(endRow - startRow + 1);
 		query.setFetchOffset(startRow);
@@ -29,7 +37,8 @@ public class BookRestServlet extends CommonRestServlet {
 		int total = totalRows().intValue();
 		if (endRow > total - 1)	
 			endRow = total - 1;		
-		XMLFetchResponse xmlResponse = new XMLFetchResponse(0, startRow, endRow, total, sortBy);	
+		XMLResponse xmlResponse = new XMLResponse();
+		xmlResponse.setFetchInfo(startRow, endRow, total, sortBy);	
 		
 		for (CayenneDataObject dataObject: dataList) {
 			Book book = (Book) dataObject;			
@@ -40,15 +49,12 @@ public class BookRestServlet extends CommonRestServlet {
 			
 			StringBuffer sb = new StringBuffer();
 			sb.append(authorSurame).append(" ").append(authorName);
-			//sb.append(" [").append(authorBirthYear).append("]");
 			
 			Map<String, String> attributes = readAttributes(dataObject);
-			attributes.put("authorInitial", sb.toString());
+			attributes.put(AUTHOR_INITIAL_ATTRIBUTE_NAME, sb.toString());
 			xmlResponse.addRecord(attributes);
 		}
 		
 		xmlResponse.writeToStream(out);
-
-		System.out.println("*** FETCH finished");
 	}
 }

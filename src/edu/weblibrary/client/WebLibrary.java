@@ -9,6 +9,7 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.smartgwt.client.data.DSCallback;
 import com.smartgwt.client.data.DSRequest;
 import com.smartgwt.client.data.DSResponse;
+import com.smartgwt.client.rpc.RPCResponse;
 import com.smartgwt.client.types.Side;
 import com.smartgwt.client.util.DateDisplayFormatter;
 import com.smartgwt.client.util.DateInputFormatter;
@@ -98,7 +99,7 @@ public class WebLibrary implements EntryPoint {
 					public void execute(DSResponse response, Object rawData, DSRequest request) {
 						GWT.log("Remove status: " + String.valueOf(response.getStatus()));
 						
-						if(response.getStatus() != response.STATUS_SUCCESS) 
+						if(response.getStatus() != RPCResponse.STATUS_SUCCESS) 
 							SC.say("Ошибка", "Не удалось удалить запись");					
 					}
 				};
@@ -196,7 +197,7 @@ public class WebLibrary implements EntryPoint {
 						public void execute(DSResponse response, Object rawData, DSRequest request) {
 							GWT.log("Remove status: " + String.valueOf(response.getStatus()));
 							
-							if(response.getStatus() != response.STATUS_SUCCESS) 
+							if(response.getStatus() != RPCResponse.STATUS_SUCCESS) 
 								SC.say("Ошибка", "Не удалось удалить запись");					
 						}
 					};

@@ -1,6 +1,8 @@
 package edu.weblibrary.server;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.StringWriter;
 
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
@@ -16,7 +18,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.cayenne.CayenneDataObject;
 import org.apache.cayenne.DataObjectUtils;
 import org.apache.cayenne.DeleteDenyException;
@@ -32,6 +33,31 @@ import org.apache.cayenne.validation.BeanValidationFailure;
 import org.apache.cayenne.validation.ValidationException;
 import org.apache.cayenne.validation.ValidationFailure;
 
+import com.smartgwt.client.rpc.RPCResponse;
+
+/**
+ * <p>Сервлет, реализующий удаленную работу с одной таблицей базы данных при помощи Apache Cayenne.
+ * 
+ * <p>Формат запросов и ответов определен требованиями к источнику данных:
+ * {@link com.smartgwt.client.data.RestDataSource} 
+ * 
+ * <p>При инициализации сервлета нужно указать класс хранимого объекта:
+ * <pre>
+ * {@code
+ * <servlet>
+ *  ... 
+ *  <init-param>
+ *   <param-name>DataObjectClass</param-name>
+ *   <param-value>edu.gallery.persistent.Painting</param-value>  		
+ *  </init-param>  		
+ * </servlet> 
+ * }
+ * </pre>
+ * @author mmdw
+ * @see com.smartgwt.client.data.RestDataSource 
+ *
+ */
+@SuppressWarnings("serial")
 public class CommonRestServlet extends HttpServlet {
 	private enum Operation {
 		FETCH, ADD, REMOVE, UPDATE
@@ -49,16 +75,26 @@ public class CommonRestServlet extends HttpServlet {
 		return (Number) DataObjectUtils.objectForQuery(context, countQuery);
 	}
 	
-	private Map<String, String> getAttributesFromRequest(HttpServletRequest req, TreeSet<String> set) {
+	/**
+	 * Извлекает отображение [имя атрибута->значение атрибута] из параметров запроса.
+	 * @param req запрос
+	 * @return Отображение имен атрибутов хранимого объекта в их значения.
+	 */
+	private Map<String, String> getAttributesFromRequest(HttpServletRequest req) {
 		Map<String, String> result = new TreeMap<String, String>();
 		
-		for (String key: set)		
+		for (String key: attributeNames)		
 			if (req.getParameterMap().containsKey(key))			
 				result.put(key, req.getParameter(key));
 		
 		return result;		
 	}
 	
+	/**
+	 * Записывает в хранимый объект значения атрибутов. 
+	 * @param cdo хранимый объект 
+	 * @param attributes отображение: [имя атрибута->значение атрибута]
+	 */
 	protected void writeAttributes(CayenneDataObject cdo, Map<String, String> attributes) {
 		for (String name: attributes.keySet())	{
 			String val = attributes.get(name);
@@ -67,6 +103,11 @@ public class CommonRestServlet extends HttpServlet {
 		}		
 	}
 	
+	/**
+	 * Читает из хранимого объекта отображение: [имя атрибута->значение атрибута]
+	 * @param cdo хранимый объект
+	 * @return отображение: [имя атрибута->значение атрибута]
+	 */
 	protected Map<String, String> readAttributes(CayenneDataObject cdo) {
 		Map<String, String> attributeMap = new TreeMap<String, String>();
 		for (String name: attributeNames)	{					
@@ -82,6 +123,11 @@ public class CommonRestServlet extends HttpServlet {
 		return attributeMap;		
 	}
 	
+	/**
+	 * Сервлет, обрабатывающий POST запрос и посылающий XML ответ в соответствии с требованиями 
+	 * к источнику данных RestDataSource. 
+	 * @see com.smartgwt.client.data.RestDataSource
+	 */
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		
@@ -98,8 +144,8 @@ public class CommonRestServlet extends HttpServlet {
 			System.out.println();
 		}			
 				
-		Operation op = Operation.valueOf(req.getParameter("_operationType").toUpperCase());
-		
+		Operation op = Operation.valueOf(req.getParameter("_operationType").toUpperCase());		
+	
 		switch (op) {
 			case FETCH: 
 				fetch(out, 
@@ -108,16 +154,22 @@ public class CommonRestServlet extends HttpServlet {
 					  req.getParameter("_sortBy"));
 				break;
 			case UPDATE:
-				update(out, getAttributesFromRequest(req, attributeNames));
+				update(out, getAttributesFromRequest(req));
 				break;
 			case REMOVE: 
-				remove(out, getAttributesFromRequest(req, attributeNames)); 
+				remove(out, getAttributesFromRequest(req)); 
 				break;
-			case ADD: 
-				add(out, getAttributesFromRequest(req, attributeNames));									
-		}
+			case ADD:
+				add(out, getAttributesFromRequest(req));									
+		}					
    }
 
+	/**
+	 * Удаляет запись из БД.
+	 * @param out поток, в который пишется XML ответ
+	 * @param map атрибуты хранимого объекта, извлеченные из параметров запроса
+	 * @see com.smartgwt.client.data.RestDataSource 
+	 */
 	protected void remove(PrintWriter out, Map<String, String> map) {		
 		SelectQuery query = 
 			new SelectQuery(DataObjectClass, ExpressionFactory.matchExp(ID_PK_COLUMN, map.get(ID_PK_COLUMN)));		
@@ -139,12 +191,18 @@ public class CommonRestServlet extends HttpServlet {
 		out.print("<response><status>0</status></response>");
 	}
 
+	/**
+	 * Обновляет запись в БД.
+	 * @param out поток, в который пишется XML ответ
+	 * @param map атрибуты хранимого объекта, извлеченные из параметров запроса
+	 * @see com.smartgwt.client.data.RestDataSource 
+	 */
 	protected void update(PrintWriter out, Map<String, String> attributes) {		
 		SelectQuery updateQuery = new SelectQuery(DataObjectClass, 
 				ExpressionFactory.matchExp(ID_PK_COLUMN, attributes.get(ID_PK_COLUMN)));
 		
 		CayenneDataObject dataObject = (CayenneDataObject) context.performQuery(updateQuery).get(0);
-		XMLUpdateResponse xmlResponse = new XMLUpdateResponse();
+		XMLResponse xmlResponse = new XMLResponse();
 		
 		writeAttributes(dataObject, attributes);
 		
@@ -154,7 +212,7 @@ public class CommonRestServlet extends HttpServlet {
 			xmlResponse.setStatus(-4);	
 			
 			for(ValidationFailure vf: e.getValidationResult().getFailures())			
-				xmlResponse.addError(((BeanValidationFailure)vf).getProperty(), (String) vf.getError());
+				xmlResponse.addErrorMessage(((BeanValidationFailure)vf).getProperty(), (String) vf.getError());
 			
 			context.rollbackChanges();
 			xmlResponse.writeToStream(out);
@@ -184,7 +242,9 @@ public class CommonRestServlet extends HttpServlet {
 		int total = totalRows().intValue();
 		if (endRow > total - 1)	
 			endRow = total - 1;		
-		XMLFetchResponse xmlResponse = new XMLFetchResponse(0, startRow, endRow, total, sortBy);	
+		XMLResponse xmlResponse = new XMLResponse();
+		xmlResponse.setStatus(RPCResponse.STATUS_SUCCESS);
+		xmlResponse.setFetchInfo(startRow, endRow, total, sortBy);
 		
 		for (CayenneDataObject dataObject: dataList)			
 			xmlResponse.addRecord(readAttributes(dataObject));
@@ -193,24 +253,27 @@ public class CommonRestServlet extends HttpServlet {
 
 		System.out.println("*** FETCH finished");
 	}
-	
-	protected void add(PrintWriter out, Map<String, String> attributes)
-	{
-		CayenneDataObject rel = (CayenneDataObject) context.newObject(DataObjectClass);	
-		XMLAddResponse xmlResponse = new XMLAddResponse();
-		
+	/**
+	 * Добавляет новую запись в БД.
+	 * @param out поток, в который пишется XML ответ
+	 * @param attributes атрибуты хранимого объекта, извлеченные из параметров запроса
+	 * @see com.smartgwt.client.data.RestDataSource
+	 */
+	protected void add(PrintWriter out, Map<String, String> attributes) throws ServletException
+	{			
+		XMLResponse xmlResponse = new XMLResponse();		
 		xmlResponse.setStatus(0);
-				
+		
+		CayenneDataObject rel = (CayenneDataObject) context.newObject(DataObjectClass);
 		writeAttributes(rel, attributes);	
 		
 		try	{		
 			context.commitChanges();			
 		} catch (ValidationException e) {	
-			xmlResponse.setStatus(-4);
-			
+			xmlResponse.setStatus(-4);			
 			
 			for(ValidationFailure vf: e.getValidationResult().getFailures())			
-				xmlResponse.addError(((BeanValidationFailure)vf).getProperty(), (String) vf.getError());
+				xmlResponse.addErrorMessage(((BeanValidationFailure)vf).getProperty(), (String) vf.getError());
 			
 			context.rollbackChanges();
 			xmlResponse.writeToStream(out);
@@ -224,12 +287,15 @@ public class CommonRestServlet extends HttpServlet {
 			return;		
 		}
 		
+		Map<String, String> record = new TreeMap<String, String>();
+		
 		for (String i: attributeNames) {
 			Object value = rel.readProperty(i);
-			if (value == null) value = new String("null");			
-			xmlResponse.addRecordAttribute(i, value.toString());
+			if (value == null) 
+				value = new String("null");
+			record.put(i, value.toString());			
 		}	
-		
+		xmlResponse.addRecord(record);		
 		xmlResponse.writeToStream(out);
 	}
 	

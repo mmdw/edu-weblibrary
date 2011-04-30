@@ -42,14 +42,14 @@ public class FormBook extends DynamicForm {
 			public void onChanged(ChangedEvent event) {
 				// TODO Auto-generated method stub
 				SelectItem item = (SelectItem) event.getItem();
-				ListGridRecord record = ((SelectItem)event.getItem()).getSelectedRecord();			
+				ListGridRecord record = item.getSelectedRecord();			
 				
 				authorId.setValue(record.getAttribute("id"));
 				
 				String surname = record.getAttribute("surname");
 				String name = record.getAttribute("name");
-				String patronymic = record.getAttribute("patronymic");
-				String birthYear = record.getAttribute("birthYear");	
+             /*	String patronymic = record.getAttribute("patronymic");
+				String birthYear = record.getAttribute("birthYear"); */	
 				
 				StringBuilder sb = new StringBuilder();
 				sb.append(name).append(" ").append(surname);
@@ -57,22 +57,7 @@ public class FormBook extends DynamicForm {
 				item.setValue(sb.toString());				
 			}
 		});
-/*		
-		authorSelectItem.setInputTransformer(new FormItemInputTransformer() {
-			public Object transformInput(DynamicForm form, FormItem item, Object value,
-					Object oldValue) {
 
-				ListGridRecord record = ((SelectItem)item).getSelectedRecord();				
-				String surname = record.getAttribute("surname");
-				String name = record.getAttribute("name");
-				String patronymic = record.getAttribute("patronymic");
-				String birthYear = record.getAttribute("birthYear");				
-				authorId.setValue(record.getAttribute("id"));
-		
-				return new String(name + " " + surname + " " + patronymic + " " + birthYear);
-			}
-		});
-*/
 		authorSelectItem.setOptionDataSource(AuthorDS.getInstance());
 		authorSelectItem.setPickListWidth(300);
 		

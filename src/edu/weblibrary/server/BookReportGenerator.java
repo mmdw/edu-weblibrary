@@ -23,10 +23,16 @@ import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.engine.query.JRJpaQueryExecuterFactory;
 import net.sf.jasperreports.engine.util.JRLoader;
 
+/**
+ * <p>Генератор отчетов по книге.
+ * <p>Отчеты могут быть в формате PDF файла и в виде HTML страницы. 
+ * <p>Формат запроса: ?id=[bookId]&type=[pdf|html]
+ * @author mmdw
+ *
+ */
 public class BookReportGenerator extends HttpServlet {
 	private final String REPORT           = "report/book.jasper";
 	private final String PERSISTENCE_UNIT = "pu4";
-	private final String HTML_IMAGES_URI  = "images/";
 	
 	enum ReportType {
 		HTML_REPORT,
@@ -45,11 +51,17 @@ public class BookReportGenerator extends HttpServlet {
 		
 		exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
 		exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, outStream);
-		exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, HTML_IMAGES_URI);
 		exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
 		
 		exporter.exportReport();		
 	}
+	/**
+	 * Записывает в поток отчет в виде файла PDF.
+	 * @param out поток вывода
+	 * @param parameters параметры заполнения отчета.
+	 * @param id первичный ключ. Определяет запись в БД, которой заполняется отчет.
+	 * @throws JRException
+	 */
 	
 	private void writePdf(ServletOutputStream out, Map parameters, int id) throws JRException {
 		JasperReport jasperReport = (JasperReport)JRLoader.loadObject(REPORT);
@@ -95,14 +107,11 @@ public class BookReportGenerator extends HttpServlet {
 			switch (type) {
 			case HTML_REPORT:
 				resp.setContentType("text/html");
-
 				writeHtml(outStream, parameters, id);
 				break;
 			case PDF_REPORT:
 				resp.setContentType("application/octet-stream"); 
-				resp.setHeader("Content-Disposition", "attachment; filename=\"report" +
-						id + ".pdf\"");
-				
+				resp.setHeader("Content-Disposition", "attachment; filename=\"report" +	id + ".pdf\"");				
 				writePdf(outStream, parameters, id);	
 				break;
 

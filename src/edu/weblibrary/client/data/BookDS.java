@@ -60,17 +60,10 @@ public class BookDS extends RestDataSource {
 	    bookPrice.setRequired(true);
 	    bookQuantity.setRequired(true);
 	    bookArrivalDate.setRequired(true);	    
-	    
-//	    public static final String TO_AUTHOR_PROPERTY = "toAuthor";
 		
 		bookId.setPrimaryKey(true);
 		authorId.setForeignKey("authorDS.id");		
-/*		
-		DateItem arrivalDateEditor = new DateItem();
-		arrivalDateEditor.set
-		bookArrivalDate.setEditorType(arrivalDateEditor);	
-		
-*/		
+	
 		setFields(authorId, authorInitial, bookId, bookArrivalDate, bookKeywords, 
 				bookQuantity, bookPrice, bookPublicationYear, bookPublishing, bookTitle);
 		setDataURL("rest_book");		

@@ -1,7 +1,5 @@
 package edu.weblibrary.client.data;
 
-import com.smartgwt.client.data.DSRequest;
-import com.smartgwt.client.data.DSResponse;
 import com.smartgwt.client.data.OperationBinding;
 import com.smartgwt.client.data.RestDataSource;
 import com.smartgwt.client.data.fields.DataSourceIntegerField;
