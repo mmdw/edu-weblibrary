@@ -30,14 +30,14 @@ import edu.weblibrary.shared.ResponseStatusEx;
  
 public class WebLibrary implements EntryPoint { 
 	public void onModuleLoad()	{
-//		SC.showConsole();
+		//SC.showConsole();
 		DateUtil.setShortDateDisplayFormatter(new DateDisplayFormatter() {			
-            public String format(Date date) {
-                if(date == null) return null;
-    
-                DateTimeFormat dateFormatter = DateTimeFormat.getFormat("dd.MM.yyyy");
-                String format = dateFormatter.format(date);
-                return format;
+			public String format(Date date) {
+				if(date == null) return null;
+				
+				DateTimeFormat dateFormatter = DateTimeFormat.getFormat("dd.MM.yyyy");
+				String format = dateFormatter.format(date);
+				return format;
 			}
 		});
 		

@@ -1,5 +1,6 @@
 package edu.weblibrary.client;
 
+import com.smartgwt.client.util.Page;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.Window;
@@ -30,6 +31,7 @@ public class WindowReport extends Window {
          
 		printButton.setTitle("Печать");
 		printButton.setIcon("[SKIN]actions/print.png");
+		
 		toolStrip.addButton(printButton);
 		
 		printButton.addClickHandler(new ClickHandler() {
@@ -39,13 +41,13 @@ public class WindowReport extends Window {
 		});
 		
 		pdfButton.setTitle("Сохранить в PDF");
-		pdfButton.setIcon("/img/pdf_icon.png");
+		pdfButton.setIcon(Page.getAppDir().concat("img/pdf_icon.png"));
 		toolStrip.addButton(pdfButton);		
 
 		pdfButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {			
 				com.google.gwt.user.client.Window.open(
-						"/reportGenerator?id=" + bookId + "&type=pdf",
+						"reportBuilder?id=" + bookId + "&type=pdf",
 						"_self",
 						"");
 			}
@@ -60,6 +62,6 @@ public class WindowReport extends Window {
 	public void setBookId(int bookId) {
 		this.bookId = new Integer(bookId);
 
-		htmlPane.setContentsURL("reportGenerator?id=" + bookId + "&type=html");
+		htmlPane.setContentsURL("reportBuilder?id=" + bookId + "&type=html");
 	}
 }

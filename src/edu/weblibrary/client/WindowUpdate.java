@@ -73,7 +73,7 @@ public class WindowUpdate extends Window {
 									Object rawData, DSRequest request) {
 								GWT.log("Status: " + String.valueOf(response.getStatus()));
 								
-								if(response.getStatus() == response.STATUS_SUCCESS) {
+								if(response.getStatus() == RPCResponse.STATUS_SUCCESS) {
 									hide();
 									form.clearValues();
 								} else {
@@ -93,8 +93,8 @@ public class WindowUpdate extends Window {
 		}
 		
 		public void editSelectedData(ListGrid listGrid) {
-			form.getValuesManager().clearValues();
-			form.getValuesManager().editSelectedData(listGrid);
+			form.clearValues();
+			form.editSelectedData(listGrid);
 			form.rememberValues();
 		}
 	}

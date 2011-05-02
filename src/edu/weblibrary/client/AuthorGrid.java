@@ -13,9 +13,9 @@ public class AuthorGrid extends ListGrid {
 		authorIdField.setHidden(true);
 		
 		setFields(
-			authorIdField,	
-			new ListGridField("name", "Имя"), 
+			authorIdField,				
 			new ListGridField("surname", "Фамилия"),
+			new ListGridField("name", "Имя"), 
 			new ListGridField("patronymic", "Отчество"),
 			new ListGridField("birthYear", "Год рождения")
 		);		

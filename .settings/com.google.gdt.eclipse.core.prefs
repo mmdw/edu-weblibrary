@@ -1,6 +1,6 @@
-#Wed Apr 27 19:31:40 MSD 2011
+#Mon May 02 23:03:31 MSD 2011
 eclipse.preferences.version=1
 jarsExcludedFromWebInfLib=/opt/smartgwt-2.4/smartgwt-skins.jar|/opt/smartgwt-2.4/smartgwt.jar|/opt/gwt-2.2.0/gwt-dev.jar
-launchConfigExternalUrlPrefix=/opt/apache-tomcat-7.0.8/webapps/edu-weblibrary
+launchConfigExternalUrlPrefix=edu-weblibrary
 warSrcDir=war
 warSrcDirIsOutput=true

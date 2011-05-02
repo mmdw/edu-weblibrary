@@ -35,13 +35,13 @@
   </servlet-mapping>   
   
    <servlet>
-  	<servlet-name>bookReportGenerator</servlet-name>
-	<servlet-class>edu.weblibrary.server.BookReportGenerator</servlet-class>    	 		
+  	<servlet-name>bookReportBuilder</servlet-name>
+	<servlet-class>edu.weblibrary.server.BookReportBuilder</servlet-class>    	 		
   </servlet>  
 
   <servlet-mapping>
-  	<servlet-name>bookReportGenerator</servlet-name>
-  	<url-pattern>/reportGenerator</url-pattern>
+  	<servlet-name>bookReportBuilder</servlet-name>
+  	<url-pattern>/reportBuilder</url-pattern>
   </servlet-mapping>
     
   <!-- Default page to serve -->

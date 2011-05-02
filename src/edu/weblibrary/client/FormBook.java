@@ -1,7 +1,6 @@
 package edu.weblibrary.client;
 
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.DateItem;
 import com.smartgwt.client.widgets.form.fields.FloatItem;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
@@ -77,9 +76,5 @@ public class FormBook extends DynamicForm {
 				bookPublicationYear, bookPublishing, bookKeywords);
 		
 		bookId.setVisible(false);
-		
-		final ValuesManager vm = new ValuesManager();
-		vm.setDataSource(BookDS.getInstance());
-		setValuesManager(vm);
 	}
 }

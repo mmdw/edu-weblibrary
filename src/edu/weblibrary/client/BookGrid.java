@@ -7,18 +7,27 @@ import edu.weblibrary.client.data.BookDS;
 
 public class BookGrid extends ListGrid {
 	BookGrid() {
-		setDataSource(BookDS.getInstance());	
+		setDataSource(BookDS.getInstance());
 		
-		setFields(
-			new ListGridField("title", "Название"),
-			new ListGridField("authorInitial","Автор"),
-			new ListGridField("publishing", "Издательство"),
-			new ListGridField("quantity", "Количество"),
-			new ListGridField("arrivalDate", "Дата поступления"),
-			new ListGridField("price", "цена"),
-			new ListGridField("publicationYear", "Год издания"),
-			new ListGridField("keywords", "Ключевые слова")
-		);
+		ListGridField titleField           = new ListGridField("title",           "Название");
+		ListGridField authorInitialField   = new ListGridField("authorInitial",   "Автор");
+		ListGridField publishingField      = new ListGridField("publishing",      "Издательство");
+		ListGridField quantityField        = new ListGridField("quantity",        "Количество");
+		ListGridField arrivalDateField     = new ListGridField("arrivalDate",     "Дата поступления");
+		ListGridField priceField           = new ListGridField("price",           "цена");
+		ListGridField publicationYearField = new ListGridField("publicationYear", "Год издания");
+		ListGridField keywordsField        = new ListGridField("keywords",        "Ключевые слова");
+		
+		quantityField.setWidth(75);
+		arrivalDateField.setWidth(110);
+		priceField.setWidth(50);
+		publicationYearField.setWidth(80);
+		
+		keywordsField.setAutoFitWidth(Boolean.TRUE);
+		
+		setFields(titleField, authorInitialField, publishingField,
+				 quantityField, arrivalDateField, priceField, publicationYearField,
+				 keywordsField);
 		
 		setAutoFetchData(true);
 		setCanEdit(false);

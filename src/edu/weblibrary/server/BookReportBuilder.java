@@ -7,10 +7,13 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
 
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporterParameter;
@@ -30,17 +33,24 @@ import net.sf.jasperreports.engine.util.JRLoader;
  * @author mmdw
  *
  */
-public class BookReportGenerator extends HttpServlet {
+public class BookReportBuilder extends HttpServlet {
+	public static final Logger LOG = Logger.getLogger(BookReportBuilder.class);
+	
 	private final String REPORT           = "report/book.jasper";
 	private final String PERSISTENCE_UNIT = "pu4";
+	private String PATH;
 	
 	enum ReportType {
 		HTML_REPORT,
 		PDF_REPORT
 	}
 	
+	public void init(ServletConfig config) {
+		PATH = config.getServletContext().getRealPath("/");
+	}
+	
 	private void writeHtml(ServletOutputStream outStream, Map parameters, int id) throws JRException {		
-		JasperReport jasperReport = (JasperReport)JRLoader.loadObject(REPORT);
+		JasperReport jasperReport = (JasperReport)JRLoader.loadObject(PATH + REPORT);
 					
 		JasperPrint jasperPrint = 
 			JasperFillManager.fillReport(
@@ -64,7 +74,7 @@ public class BookReportGenerator extends HttpServlet {
 	 */
 	
 	private void writePdf(ServletOutputStream out, Map parameters, int id) throws JRException {
-		JasperReport jasperReport = (JasperReport)JRLoader.loadObject(REPORT);
+		JasperReport jasperReport = (JasperReport)JRLoader.loadObject(PATH + REPORT);
 		
 		JasperPrint jasperPrint = 
 			JasperFillManager.fillReport(
@@ -100,7 +110,7 @@ public class BookReportGenerator extends HttpServlet {
 			parameters.put("BOOK_ID_PARAMETER", id);
 			parameters.put(JRJpaQueryExecuterFactory.PARAMETER_JPA_ENTITY_MANAGER, em);	
 			
-			JasperFillManager.fillReportToFile(REPORT, parameters);
+			JasperFillManager.fillReportToFile(PATH + REPORT, parameters);
 			
 			ServletOutputStream outStream = resp.getOutputStream();
 			
