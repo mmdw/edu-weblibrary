@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
@@ -18,7 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.cayenne.CayenneDataObject;
 import org.apache.cayenne.DataObjectUtils;
-import org.apache.cayenne.DeleteDenyException;
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.access.DataContext;
 import org.apache.cayenne.exp.ExpressionFactory;
@@ -188,11 +188,14 @@ public class CommonRestServlet extends HttpServlet {
 		CayenneDataObject a = (CayenneDataObject) context.performQuery(query).get(0);		
 		XMLResponse resp = new XMLResponse();
 		
+		
 		for (ObjRelationship rel: a.getObjEntity().getRelationships()) {
 			if (rel.getDeleteRule() == DeleteRule.DENY) {
-				resp.setStatus(ResponseStatusEx.STATUS_DELETE_DENY_ERROR);
-				resp.writeToStream(out);				
-				return;
+				if (((Collection)a.readProperty(rel.getName())).size() != 0) {
+					resp.setStatus(ResponseStatusEx.STATUS_DELETE_DENY_ERROR);
+					resp.writeToStream(out);				
+					return;
+				}
 			}
 		}			
 		
@@ -203,7 +206,7 @@ public class CommonRestServlet extends HttpServlet {
 			e.printStackTrace();
 			System.out.println(e.getMessage());
 			
-			resp.setStatus(-4);			
+			resp.setStatus(RPCResponse.STATUS_VALIDATION_ERROR);			
 			context.rollbackChanges();
 			return;
 		}		
@@ -231,7 +234,7 @@ public class CommonRestServlet extends HttpServlet {
 		try	{		
 			context.commitChanges();
 		} catch (ValidationException e) {				
-			xmlResponse.setStatus(-4);	
+			xmlResponse.setStatus(RPCResponse.STATUS_SUCCESS);	
 			
 			for(ValidationFailure vf: e.getValidationResult().getFailures())			
 				xmlResponse.addErrorMessage(((BeanValidationFailure)vf).getProperty(), (String) vf.getError());
@@ -241,7 +244,7 @@ public class CommonRestServlet extends HttpServlet {
 			return;
 		}
 		
-		xmlResponse.setStatus(0);
+		xmlResponse.setStatus(RPCResponse.STATUS_SUCCESS);
 		xmlResponse.writeToStream(out);
 		LOG.debug("*** UPDATE finished");
 	}
@@ -285,7 +288,6 @@ public class CommonRestServlet extends HttpServlet {
 	{			
 		LOG.debug("*** ADD started");
 		XMLResponse xmlResponse = new XMLResponse();		
-		xmlResponse.setStatus(0);
 		
 		CayenneDataObject rel = (CayenneDataObject) context.newObject(DataObjectClass);
 		writeAttributes(rel, attributes);	
@@ -293,7 +295,7 @@ public class CommonRestServlet extends HttpServlet {
 		try	{		
 			context.commitChanges();			
 		} catch (ValidationException e) {	
-			xmlResponse.setStatus(-4);			
+			xmlResponse.setStatus(RPCResponse.STATUS_VALIDATION_ERROR);			
 			
 			for(ValidationFailure vf: e.getValidationResult().getFailures())			
 				xmlResponse.addErrorMessage(((BeanValidationFailure)vf).getProperty(), (String) vf.getError());
@@ -304,7 +306,7 @@ public class CommonRestServlet extends HttpServlet {
 		} catch (Exception ex) {	
 			ex.printStackTrace();
 			
-			xmlResponse.setStatus(-4);
+			xmlResponse.setStatus(RPCResponse.STATUS_VALIDATION_ERROR);
 			context.rollbackChanges();
 			xmlResponse.writeToStream(out);
 			return;		
@@ -318,6 +320,7 @@ public class CommonRestServlet extends HttpServlet {
 				value = new String("null");
 			record.put(i, value.toString());			
 		}	
+		xmlResponse.setStatus(RPCResponse.STATUS_SUCCESS);
 		xmlResponse.addRecord(record);		
 		xmlResponse.writeToStream(out);
 		LOG.debug("*** ADD finished");
