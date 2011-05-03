@@ -5,11 +5,11 @@
 	<property name="ireport.zoom" value="1.4641000000000006"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="154"/>
-	<style name="Title"  mode="Transparent" fontName="Times New Roman" fontSize="50" pdfFontName="report/fonts/times.ttf" pdfEncoding="Cp1251"  isPdfEmbedded="true"/>
-	<style name="SubTitle" forecolor="#666666" fontName="Times New Roman" fontSize="18" pdfFontName="report/fonts/times.ttf" pdfEncoding="Cp1251"  isPdfEmbedded="true"/>
-	<style name="Column header"  mode="Transparent" fontName="Times New Roman" fontSize="14" pdfFontName="report/fonts/timesbd.ttf" pdfEncoding="Cp1251"  isPdfEmbedded="true"/>
-	<style name="Detail" mode="Transparent" fontName="Times New Roman" pdfFontName="report/fonts/times.ttf" pdfEncoding="Cp1251"  isPdfEmbedded="true"/>
-	<style name="Row" mode="Transparent" fontName="Times New Roman" pdfFontName="report/fonts/times.ttf" pdfEncoding="Cp1251"  isPdfEmbedded="true">
+	<style name="Title"  mode="Transparent" fontName="Times New Roman" fontSize="50" pdfFontName="fonts/times.ttf" pdfEncoding="Cp1251"  isPdfEmbedded="true"/>
+	<style name="SubTitle" forecolor="#666666" fontName="Times New Roman" fontSize="18" pdfFontName="fonts/times.ttf" pdfEncoding="Cp1251"  isPdfEmbedded="true"/>
+	<style name="Column header"  mode="Transparent" fontName="Times New Roman" fontSize="14" pdfFontName="fonts/timesbd.ttf" pdfEncoding="Cp1251"  isPdfEmbedded="true"/>
+	<style name="Detail" mode="Transparent" fontName="Times New Roman" pdfFontName="fonts/times.ttf" pdfEncoding="Cp1251"  isPdfEmbedded="true"/>
+	<style name="Row" mode="Transparent" fontName="Times New Roman" pdfFontName="fonts/times.ttf" pdfEncoding="Cp1251"  isPdfEmbedded="true">
 		<conditionalStyle>
 			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
 			<style mode="Opaque" backcolor="#F0EFEF"/>

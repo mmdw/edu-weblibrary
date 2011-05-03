@@ -15,14 +15,21 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import com.lowagie.text.FontFactory;
+
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.export.FontKey;
 import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
+import net.sf.jasperreports.engine.export.PdfFont;
+import net.sf.jasperreports.engine.fonts.FontFamily;
+import net.sf.jasperreports.engine.fonts.SimpleFontFamily;
 import net.sf.jasperreports.engine.query.JRJpaQueryExecuterFactory;
 import net.sf.jasperreports.engine.util.JRLoader;
 
@@ -36,7 +43,8 @@ import net.sf.jasperreports.engine.util.JRLoader;
 public class BookReportBuilder extends HttpServlet {
 	public static final Logger LOG = Logger.getLogger(BookReportBuilder.class);
 	
-	private final String REPORT           = "report/book.jasper";
+	private final String REPORT_JASPER           = "report/book.jasper";
+	private final String REPORT_JRXML            = "report/book.jrxml";
 	private final String PERSISTENCE_UNIT = "pu4";
 	private String PATH;
 	
@@ -50,7 +58,7 @@ public class BookReportBuilder extends HttpServlet {
 	}
 	
 	private void writeHtml(ServletOutputStream outStream, Map parameters, int id) throws JRException {		
-		JasperReport jasperReport = (JasperReport)JRLoader.loadObject(PATH + REPORT);
+		JasperReport jasperReport = (JasperReport)JRLoader.loadObject(PATH + REPORT_JASPER);
 					
 		JasperPrint jasperPrint = 
 			JasperFillManager.fillReport(
@@ -74,18 +82,16 @@ public class BookReportBuilder extends HttpServlet {
 	 */
 	
 	private void writePdf(ServletOutputStream out, Map parameters, int id) throws JRException {
-		JasperReport jasperReport = (JasperReport)JRLoader.loadObject(PATH + REPORT);
+		JasperReport jasperReport = (JasperReport)JRLoader.loadObject(PATH + REPORT_JASPER);
 		
 		JasperPrint jasperPrint = 
 			JasperFillManager.fillReport(
 				jasperReport, 
-				parameters);
-					
-		JRPdfExporter exporter = new JRPdfExporter();		
+				parameters);					
 		
+		JRPdfExporter exporter = new JRPdfExporter();		
 		exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
-		exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, out);
-	
+		exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, out);	
 		exporter.exportReport();		
 	}
 	
@@ -110,7 +116,7 @@ public class BookReportBuilder extends HttpServlet {
 			parameters.put("BOOK_ID_PARAMETER", id);
 			parameters.put(JRJpaQueryExecuterFactory.PARAMETER_JPA_ENTITY_MANAGER, em);	
 			
-			JasperFillManager.fillReportToFile(PATH + REPORT, parameters);
+			JasperFillManager.fillReportToFile(PATH + REPORT_JASPER, parameters);
 			
 			ServletOutputStream outStream = resp.getOutputStream();
 			

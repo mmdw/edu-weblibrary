@@ -277,7 +277,7 @@ public class CommonRestServlet extends HttpServlet {
 	}
 	/**
 	 * Добавляет новую запись в БД.
-	 * @param out поток, в который пишется XML ответ
+	 * @param out поток, в который выводится XML ответ
 	 * @param attributes атрибуты хранимого объекта, извлеченные из параметров запроса
 	 * @see com.smartgwt.client.data.RestDataSource
 	 */
@@ -309,7 +309,7 @@ public class CommonRestServlet extends HttpServlet {
 			xmlResponse.writeToStream(out);
 			return;		
 		}
-		
+			
 		Map<String, String> record = new TreeMap<String, String>();
 		
 		for (String i: attributeNames) {
