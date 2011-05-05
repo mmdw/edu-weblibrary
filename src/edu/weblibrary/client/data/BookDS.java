@@ -68,5 +68,4 @@ public class BookDS extends RestDataSource {
 				bookQuantity, bookPrice, bookPublicationYear, bookPublishing, bookTitle);
 		setDataURL("rest_book");		
 	}
-
 }

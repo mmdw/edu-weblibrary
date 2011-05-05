@@ -1,13 +1,19 @@
 package edu.weblibrary.server;
+import edu.weblibrary.server.persistence.cayenne.Author;
 import edu.weblibrary.server.persistence.cayenne.Book;
 
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.cayenne.CayenneDataObject;
+import org.apache.cayenne.exp.Expression;
 import org.apache.cayenne.query.SelectQuery;
 import org.apache.cayenne.query.SortOrder;
+
+import com.smartgwt.client.rpc.RPCResponse;
 
 /**
  * Сервлет, реализующий работу с таблицей book. 
@@ -17,7 +23,20 @@ import org.apache.cayenne.query.SortOrder;
  * @author mmdw
  */
 public class BookRestServlet extends CommonRestServlet {
-	static final String AUTHOR_INITIAL_ATTRIBUTE_NAME = "authorInitial";
+	static final String AUTHOR_INITIALS_ATTRIBUTE_NAME = "authorInitials";
+
+	private String makeAuthorInitial(Author author)
+	{		
+		//SelectQuery authorQuery = new SelectQuery(Author.class, new Ex)
+		String authorName = author.getName();
+		String authorSurame = author.getSurname();	
+		String authorBirthYear = author.getBirthYear().toString();
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append(authorSurame).append(" ").append(authorName);
+		
+		return sb.toString();		
+	}
 	
 	protected void fetch(PrintWriter out, int startRow, int endRow, String sortBy) {		
 		SelectQuery query = new SelectQuery(DataObjectClass);
@@ -43,18 +62,37 @@ public class BookRestServlet extends CommonRestServlet {
 		for (CayenneDataObject dataObject: dataList) {
 			Book book = (Book) dataObject;			
 			
-			String authorName = book.getToAuthor().getName();
-			String authorSurame = book.getToAuthor().getSurname();	
-			String authorBirthYear = book.getToAuthor().getBirthYear().toString();
-			
-			StringBuffer sb = new StringBuffer();
-			sb.append(authorSurame).append(" ").append(authorName);
-			
 			Map<String, String> attributes = readAttributes(dataObject);
-			attributes.put(AUTHOR_INITIAL_ATTRIBUTE_NAME, sb.toString());
+			attributes.put(AUTHOR_INITIALS_ATTRIBUTE_NAME, makeAuthorInitial(book.getToAuthor()));
 			xmlResponse.addRecord(attributes);
 		}
 		
 		xmlResponse.writeToStream(out);
+	}
+	
+	protected XMLResponse add_successResponse(CayenneDataObject cdo) {
+		Map<String, String> record = new TreeMap<String, String>();
+		XMLResponse xmlResponse    = new XMLResponse();
+		
+		for (String i: getAttributeNames()) {
+			Object value = cdo.readProperty(i);
+			if (value == null) 
+				value = new String("null");
+			record.put(i, value.toString());			
+		}	
+		
+		Book book = (Book)cdo;
+		final Expression template = Expression.fromString("id = $id");
+		Map params = new HashMap();		
+		params.put("id", book.readProperty("authorId"));
+		SelectQuery query = new SelectQuery(Author.class, template.expWithParameters(params));
+		List values = context.performQuery(query);
+		Author author = (Author)values.get(0);
+		
+		record.put(AUTHOR_INITIALS_ATTRIBUTE_NAME, makeAuthorInitial(author));
+		xmlResponse.setStatus(RPCResponse.STATUS_SUCCESS);
+		xmlResponse.addRecord(record);
+		
+		return xmlResponse;
 	}
 }

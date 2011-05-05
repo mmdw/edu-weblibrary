@@ -80,6 +80,10 @@ public class CommonRestServlet extends HttpServlet {
 		return (Number) DataObjectUtils.objectForQuery(context, countQuery);
 	}
 	
+	protected TreeSet<String> getAttributeNames() {
+		return attributeNames;
+	}
+	
 	/**
 	 * Извлекает отображение [имя атрибута->значение атрибута] из параметров запроса.
 	 * @param req запрос
@@ -185,13 +189,13 @@ public class CommonRestServlet extends HttpServlet {
 		SelectQuery query = 
 			new SelectQuery(DataObjectClass, ExpressionFactory.matchExp(ID_PK_COLUMN, map.get(ID_PK_COLUMN)));		
 		
-		CayenneDataObject a = (CayenneDataObject) context.performQuery(query).get(0);		
-		XMLResponse resp = new XMLResponse();
+		CayenneDataObject cdo = (CayenneDataObject) context.performQuery(query).get(0);		
+		XMLResponse resp = new XMLResponse();		
 		
-		
-		for (ObjRelationship rel: a.getObjEntity().getRelationships()) {
+		for (ObjRelationship rel: cdo.getObjEntity().getRelationships()) {
 			if (rel.getDeleteRule() == DeleteRule.DENY) {
-				if (((Collection)a.readProperty(rel.getName())).size() != 0) {
+				if (! ((Collection<? extends CayenneDataObject>)cdo
+						.readProperty(rel.getName())).isEmpty()) {
 					resp.setStatus(ResponseStatusEx.STATUS_DELETE_DENY_ERROR);
 					resp.writeToStream(out);				
 					return;
@@ -200,7 +204,7 @@ public class CommonRestServlet extends HttpServlet {
 		}			
 		
 		try {
-			context.deleteObject(a);
+			context.deleteObject(cdo);
 			context.commitChanges();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -278,6 +282,29 @@ public class CommonRestServlet extends HttpServlet {
 
 		LOG.debug("*** FETCH finished");
 	}
+	
+	/**
+	 * Возвращает XML ответ для успешно завершившейся операции ADD.
+	 * @param cdo
+	 * @return
+	 * @see com.smartgwt.client.data.RestDataSource
+	 */
+	protected XMLResponse add_successResponse(CayenneDataObject cdo) {		
+		Map<String, String> record = new TreeMap<String, String>();
+		XMLResponse xmlResponse    = new XMLResponse();
+		
+		for (String i: attributeNames) {
+			Object value = cdo.readProperty(i);
+			if (value == null) 
+				value = new String("null");
+			record.put(i, value.toString());			
+		}	
+		xmlResponse.setStatus(RPCResponse.STATUS_SUCCESS);
+		xmlResponse.addRecord(record);	
+		
+		return xmlResponse;
+	}
+	
 	/**
 	 * Добавляет новую запись в БД.
 	 * @param out поток, в который выводится XML ответ
@@ -289,8 +316,8 @@ public class CommonRestServlet extends HttpServlet {
 		LOG.debug("*** ADD started");
 		XMLResponse xmlResponse = new XMLResponse();		
 		
-		CayenneDataObject rel = (CayenneDataObject) context.newObject(DataObjectClass);
-		writeAttributes(rel, attributes);	
+		CayenneDataObject cdo = (CayenneDataObject) context.newObject(DataObjectClass);
+		writeAttributes(cdo, attributes);	
 		
 		try	{		
 			context.commitChanges();			
@@ -306,22 +333,13 @@ public class CommonRestServlet extends HttpServlet {
 		} catch (Exception ex) {	
 			ex.printStackTrace();
 			
-			xmlResponse.setStatus(RPCResponse.STATUS_VALIDATION_ERROR);
+			xmlResponse.setStatus(RPCResponse.STATUS_FAILURE);
 			context.rollbackChanges();
 			xmlResponse.writeToStream(out);
 			return;		
-		}
+		}		
 			
-		Map<String, String> record = new TreeMap<String, String>();
-		
-		for (String i: attributeNames) {
-			Object value = rel.readProperty(i);
-			if (value == null) 
-				value = new String("null");
-			record.put(i, value.toString());			
-		}	
-		xmlResponse.setStatus(RPCResponse.STATUS_SUCCESS);
-		xmlResponse.addRecord(record);		
+		xmlResponse = add_successResponse(cdo);	
 		xmlResponse.writeToStream(out);
 		LOG.debug("*** ADD finished");
 	}

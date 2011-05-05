@@ -68,6 +68,4 @@ public abstract class _Author extends CayenneDataObject {
     public List<Book> getBookArray() {
         return (List<Book>)readProperty("bookArray");
     }
-
-
 }
