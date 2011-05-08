@@ -24,7 +24,7 @@ public class FormBook extends DynamicForm {
 		final IntegerItem authorId = new IntegerItem("authorId");
 		authorId.setVisible(false);
 		
-		SelectItem authorSelectItem = new SelectItem("authorInitial", "Автор");
+		SelectItem authorSelectItem = new SelectItem("authorInitials", "Автор");
 		authorSelectItem.setFetchMissingValues(false);
 		
 		ListGridField authorNameField = new ListGridField("name", "Имя");

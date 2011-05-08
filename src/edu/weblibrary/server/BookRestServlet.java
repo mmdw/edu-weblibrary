@@ -25,7 +25,7 @@ import com.smartgwt.client.rpc.RPCResponse;
 public class BookRestServlet extends CommonRestServlet {
 	static final String AUTHOR_INITIALS_ATTRIBUTE_NAME = "authorInitials";
 
-	private String makeAuthorInitial(Author author)
+	private String makeAuthorInitials(Author author)
 	{		
 		//SelectQuery authorQuery = new SelectQuery(Author.class, new Ex)
 		String authorName = author.getName();
@@ -63,7 +63,7 @@ public class BookRestServlet extends CommonRestServlet {
 			Book book = (Book) dataObject;			
 			
 			Map<String, String> attributes = readAttributes(dataObject);
-			attributes.put(AUTHOR_INITIALS_ATTRIBUTE_NAME, makeAuthorInitial(book.getToAuthor()));
+			attributes.put(AUTHOR_INITIALS_ATTRIBUTE_NAME, makeAuthorInitials(book.getToAuthor()));
 			xmlResponse.addRecord(attributes);
 		}
 		
@@ -89,7 +89,7 @@ public class BookRestServlet extends CommonRestServlet {
 		List values = context.performQuery(query);
 		Author author = (Author)values.get(0);
 		
-		record.put(AUTHOR_INITIALS_ATTRIBUTE_NAME, makeAuthorInitial(author));
+		record.put(AUTHOR_INITIALS_ATTRIBUTE_NAME, makeAuthorInitials(author));
 		xmlResponse.setStatus(RPCResponse.STATUS_SUCCESS);
 		xmlResponse.addRecord(record);
 		

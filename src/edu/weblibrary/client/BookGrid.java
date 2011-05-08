@@ -11,7 +11,7 @@ public class BookGrid extends ListGrid {
 		
 		ListGridField idField              = new ListGridField("id",              "id");
 		ListGridField titleField           = new ListGridField("title",           "Название");
-		ListGridField authorInitialField   = new ListGridField("authorInitials",   "Автор");
+		ListGridField authorInitialsField  = new ListGridField("authorInitials",  "Автор");
 		ListGridField publishingField      = new ListGridField("publishing",      "Издательство");
 		ListGridField quantityField        = new ListGridField("quantity",        "Количество");
 		ListGridField arrivalDateField     = new ListGridField("arrivalDate",     "Дата поступления");
@@ -19,7 +19,7 @@ public class BookGrid extends ListGrid {
 		ListGridField publicationYearField = new ListGridField("publicationYear", "Год издания");
 		ListGridField keywordsField        = new ListGridField("keywords",        "Ключевые слова");
 		
-		//idField.setHidden(true);
+		idField.setHidden(true);
 		quantityField.setWidth(75);
 		arrivalDateField.setWidth(110);
 		priceField.setWidth(50);
@@ -27,7 +27,7 @@ public class BookGrid extends ListGrid {
 		
 		keywordsField.setAutoFitWidth(Boolean.TRUE);
 		
-		setFields(idField, titleField, authorInitialField, publishingField,
+		setFields(idField, titleField, authorInitialsField, publishingField,
 				 quantityField, arrivalDateField, priceField, publicationYearField,
 				 keywordsField);
 		
